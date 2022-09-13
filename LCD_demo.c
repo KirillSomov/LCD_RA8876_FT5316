@@ -2036,9 +2036,9 @@ void Gradient_Demo(void)
 		for(int i = 0; i < Line24; i+=Line1)
 		{
 			if(!(j%2))
-				LCD_printString1("Hello, ", 100+j*168, i, 0xB0B0|(j)|(j<<8), Black);
+				LCD_printString("Hello, ", 100+j*168, i, 0xB0B0|(j)|(j<<8), Black);
 			else
-				LCD_printString1("World! ", 100+84+j, i, 0xB0B0|(j)|(j<<8), Black);
+				LCD_printString("World! ", 100+84+j, i, 0xB0B0|(j)|(j<<8), Black);
 			delay_ms(50);
 		}
 	}  

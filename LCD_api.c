@@ -20,13 +20,13 @@ void LCD_init(void)
 }
 
 
-void LCD_setPage(unsigned long layer)
+void LCD_setPage(unsigned long page)
 {
   Select_Main_Window_16bpp();
-  Main_Image_Start_Address(layer);
+  Main_Image_Start_Address(page);
   Main_Image_Width(1024);
   Main_Window_Start_XY(0,0);
-  Canvas_Image_Start_address(layer);
+  Canvas_Image_Start_address(page);
   Canvas_image_width(1024);
   Active_Window_XY(0,0);
   Active_Window_WH(1024,600);
@@ -42,7 +42,7 @@ void LCD_cleanCurrentPage(unsigned short color)
 }
 
 
-void LCD_printString1(char* string, unsigned short x, unsigned short y, unsigned short backgroundColor, unsigned short textColor)
+void LCD_printString(char* string, unsigned short x, unsigned short y, unsigned short backgroundColor, unsigned short textColor)
 {
   Foreground_color_65k(textColor);
   Background_color_65k(backgroundColor);
@@ -124,115 +124,45 @@ void LCD_drawFilledEllipse(unsigned short x, unsigned short y, unsigned short rx
 }
 
 
-void LCD_drawBitmap(uint16_t* pixels, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+void LCD_drawBitmap(unsigned short* pixels, unsigned short x, unsigned short y, unsigned short w, unsigned short h)
 {
-  unsigned long im=1;
-
-  //DMA initial setting
-  Enable_SFlash_SPI();
-    Select_SFI_1();
-    Select_SFI_DMA_Mode();
-    Select_SFI_24bit_Address();
-
-    //Select_SFI_Waveform_Mode_0();
-    Select_SFI_Waveform_Mode_3();
-
-    //Select_SFI_0_DummyRead();	//normal read mode
-    Select_SFI_8_DummyRead(); //1byte dummy cycle
-    //Select_SFI_16_DummyRead();
-    //Select_SFI_24_DummyRead();
-
-    Select_SFI_Single_Mode();
-    //Select_SFI_Dual_Mode0();
-    //Select_SFI_Dual_Mode1();
-
-    SPI_Clock_Period(0);
-
-
-  SFI_DMA_Destination_Upper_Left_Corner(x, y); // x, y
-    SFI_DMA_Transfer_Width_Height(w, h);
-    SFI_DMA_Source_Width(1024);//
-
-  SFI_DMA_Source_Start_Address(im*1024*600*2*1);//
-  Start_SFI_DMA();
-    Check_Busy_SFI_DMA();
-
-
-  //write 16x16 pattern to sdram
-  //Pattern_Format_16X16();	
-  Canvas_Image_Start_address(PAGE5_START_ADDR);//any layer 
-    Canvas_image_width(1024);
-    Active_Window_XY(x, y);
-    Active_Window_WH(w, h);
-    Goto_Pixel_XY(x, y);
-    Show_picture(w*h, pixels); 
-
-  Canvas_Image_Start_address(PAGE0_START_ADDR);//
-    Canvas_image_width(1024);
-    Active_Window_XY(0,0);
-    Active_Window_WH(1024,600);
-
-    
-  BTE_S0_Color_16bpp();
-    BTE_S0_Memory_Start_Address(PAGE5_START_ADDR);
-    BTE_S0_Image_Width(w);
- 
-    BTE_S1_Color_16bpp();
-    BTE_S1_Memory_Start_Address(0);
-    BTE_S1_Image_Width(1024);
-
-    BTE_Destination_Color_16bpp();  
-    BTE_Destination_Memory_Start_Address(PAGE0_START_ADDR);
-    BTE_Destination_Image_Width(1024);
-
-    BTE_ROP_Code(0x0C);//(0xc);
-    BTE_Operation_Code(0x02);//0x06);//pattern fill	
-
-  BTE_S1_Window_Start_XY(x, y);      
-    BTE_Destination_Window_Start_XY(x, y); // x, y
-    BTE_Window_Size(w, h);
-
-    BTE_Enable();   
-    Check_BTE_Busy();  
-}
-
-
-void LCD_drawBitmap2(uint8_t* pixels, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
-{
-  Canvas_Image_Start_address(PAGE1_START_ADDR);//Layer 2
   Active_Window_XY(x, y);
   Active_Window_WH(w, h);
   Goto_Pixel_XY(x, y);
-  Show_picture(w*h, pixels); 
-  //Active_Window_XY(0,0);
-  //Active_Window_WH(1024,600);
+  Show_picture(w*h, pixels);
+  Active_Window_XY(0,0);
+  Active_Window_WH(1024,600);
 }
 
 
-void LCD_drawBitmap3(uint16_t* pixels, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+void LCD_copyArea(unsigned long sourcePage, unsigned long destPage,
+                  unsigned short x, unsigned short y, unsigned short w, unsigned short h)
 {
-  //creat grid 500*400 to layer2 used geometric draw 
-  //Canvas_Image_Start_address(PAGE1_START_ADDR);//Layer 2
-  // draw picture
-  //LCD_drawBitmap2(pixels, x, y, w, h);
-
-  //BTE memory(move) grid to layer1
+  //BTE memory(move) from source page to dest page
   BTE_S0_Color_16bpp();
-    BTE_S0_Memory_Start_Address(PAGE1_START_ADDR);
-    BTE_S0_Image_Width(1024);
-    BTE_S0_Window_Start_XY(x, y);
+  BTE_S0_Memory_Start_Address(sourcePage);
+  BTE_S0_Image_Width(1024);
+  BTE_S0_Window_Start_XY(x, y);
 
-    BTE_Destination_Color_16bpp();
-    BTE_Destination_Memory_Start_Address(PAGE0_START_ADDR);
-    BTE_Destination_Image_Width(1024);
-    BTE_Destination_Window_Start_XY(x, y);
-    BTE_Window_Size(w, h);
+  BTE_Destination_Color_16bpp();
+  BTE_Destination_Memory_Start_Address(destPage);
+  BTE_Destination_Image_Width(1024);
+  BTE_Destination_Window_Start_XY(x, y);
+  BTE_Window_Size(w, h);
 
   //move with ROP 0 
-    BTE_ROP_Code(12); //memory copy s0(layer2)grid to layer1  
-    BTE_Operation_Code(2); //BTE move
-    BTE_Enable();
-    Check_BTE_Busy();
+  BTE_ROP_Code(12);       //memory copy s0(sourcePage) to destPage
+  BTE_Operation_Code(2);  //BTE move
+  BTE_Enable();
+  Check_BTE_Busy();
+}
 
-  //Canvas_Image_Start_address(PAGE0_START_ADDR);//Layer 1
+
+void LCD_drawBitmapPageBuf(unsigned short* pixels,
+                           unsigned long bufPage, unsigned long destPage,
+                           unsigned short x, unsigned short y, unsigned short w, unsigned short h)
+{
+  Canvas_Image_Start_address(bufPage);
+  LCD_drawBitmap(pixels, x, y, w, h);
+  LCD_copyArea(bufPage, destPage, x, y, w, h);
 }
