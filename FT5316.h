@@ -1,11 +1,9 @@
-//FT5316
-/* touch panel interface define */
 
 #ifndef FT5316_H
 #define FT5316_H
 
-#define PEN FT5316_INT_READ
 
+#include "stdbool.h"
 #include "RA8876.h"
 #include "I2C.h"
 
@@ -17,16 +15,17 @@
 #define	FT5316_INT_PORT		GPIOD
 #define	FT5316_INT_PIN		GPIO_Pin_5
 
-#define	FT5316_RSTN_RESET		GPIO_ResetBits(FT5316_RSTN_PORT,	FT5316_RSTN_PIN)
-#define	FT5316_RSTN_SET			GPIO_SetBits(FT5316_RSTN_PORT,		FT5316_RSTN_PIN)
+#define	FT5316_RSTN_RESET	GPIO_ResetBits(FT5316_RSTN_PORT,	FT5316_RSTN_PIN)
+#define	FT5316_RSTN_SET		GPIO_SetBits(FT5316_RSTN_PORT,		FT5316_RSTN_PIN)
 
-#define	FT5316_INT_READ			GPIO_ReadInputDataBit(FT5316_INT_PORT,	FT5316_INT_PIN)
+#define	FT5316_INT_READ		!GPIO_ReadInputDataBit(FT5316_INT_PORT,	FT5316_INT_PIN)
 
 
-#define CONFIG_FT5X0X_MULTITOUCH    //Define the multi-touch
+//#define CONFIG_FT5X0X_MULTITOUCH    //Define the multi-touch
 //Touch Status	 
-#define Key_Down 0x01
-#define Key_Up   0x00 
+#define KEY_DOWN 0x01
+#define KEY_UP   0x00 
+
 
 struct _ts_event
 {
@@ -41,10 +40,8 @@ struct _ts_event
     uint    x5;
     uint    y5;
     uchar   touch_point;
-	uchar     Key_Sta;	
+	uchar   Key_Sta;
 };
-
-extern struct _ts_event ts_event; 
 
 
 #define FT5316_ADDRESS 0x38
@@ -53,12 +50,12 @@ extern struct _ts_event ts_event;
 #define READ_ADD	0x71
 
 
-void TOUCH_Init(void);
-void TOUCH_Wr_Reg(uchar RegIndex, uchar RegValue1);
-uchar   TOUCH_Read_Reg(uchar RegIndex);
-void TOUCH_RdParFrPCTPFun(uchar *PCTP_Par,uchar ValFlag);
-uchar ft5x0x_read_data(void);
-struct _ts_event touchGetPoint(void);
+void FT5316_init(void);
+void FT5316_Wr_Reg(uchar RegIndex, uchar RegValue1);
+uchar FT5316_Read_Reg(uchar RegIndex);
+bool FT5316_isInterrupt(void);
+uchar FT5316_touchDataRead(void);
+bool FT5316_sampleTouch(unsigned short* x, unsigned short* y);
 
 
 #endif

@@ -165,4 +165,26 @@ void LCD_drawBitmapPageBuf(unsigned short* pixels,
   Canvas_Image_Start_address(bufPage);
   LCD_drawBitmap(pixels, x, y, w, h);
   LCD_copyArea(bufPage, destPage, x, y, w, h);
+  LCD_setPage(destPage);
+}
+
+
+void Touch_init(void)
+{
+  FT5316_init();
+}
+
+
+void Touch_handler(void)
+{
+  if(FT5316_isInterrupt())
+  {
+    FT5316_touchDataRead();
+  }
+}
+
+
+bool Touch_sampleTouch(unsigned short* x, unsigned short* y)
+{
+  return FT5316_sampleTouch(x, y);
 }

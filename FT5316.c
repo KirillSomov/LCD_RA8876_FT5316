@@ -3,7 +3,9 @@
 #include "stm32f4xx_gpio.h"
 
 
-// сброс контроллера
+static struct _ts_event ts_event = {0};
+
+
 static void FT5316_reset(void)
 {
 	FT5316_RSTN_RESET;
@@ -13,13 +15,30 @@ static void FT5316_reset(void)
 }
 
 
-void TOUCH_Init(void)
+static void FT5316_RdParFrPCTPFun(uchar *PCTP_Par,uchar ValFlag)
+{  
+  I2Cx_readDataBurst(I2C1, FT5316_ADDRESS, 0x00, ValFlag, PCTP_Par);
+}
+
+
+bool FT5316_isInterrupt(void)
+{
+ 	if(FT5316_INT_READ)      //Detect the occurrence of an interrupt
+ 	{
+		ts_event.Key_Sta = KEY_DOWN;
+    return true;
+ 	}
+  return false;
+}
+
+
+void FT5316_init(void)
 {
   FT5316_reset();
 }
 
 
-void TOUCH_Wr_Reg(uchar RegIndex, uchar RegValue1)
+void FT5316_Wr_Reg(uchar RegIndex, uchar RegValue1)
 {  
   I2Cx_writeData(I2C1, FT5316_ADDRESS, RegIndex, RegValue1);
   
@@ -27,7 +46,7 @@ void TOUCH_Wr_Reg(uchar RegIndex, uchar RegValue1)
 }
 
 
-uchar TOUCH_Read_Reg(uchar RegIndex)
+uchar FT5316_Read_Reg(uchar RegIndex)
 {
   uchar receive=0;
  	
@@ -36,22 +55,14 @@ uchar TOUCH_Read_Reg(uchar RegIndex)
 }
 
 
-void TOUCH_RdParFrPCTPFun(uchar *PCTP_Par,uchar ValFlag)
-{
-  uchar k;
-  
-  I2Cx_readDataBurst(I2C1, FT5316_ADDRESS, 0x00, ValFlag, PCTP_Par);
-}
-
-
-uchar ft5x0x_read_data(void)
+uchar FT5316_touchDataRead(void)
 {
   uchar buf[32] = {0}; uchar ret = 0;
 
 	#ifdef CONFIG_FT5X0X_MULTITOUCH
-		TOUCH_RdParFrPCTPFun(buf, 31);
+		FT5316_RdParFrPCTPFun(buf, 31);
 	#else
-  		TOUCH_RdParFrPCTPFun(buf, 7);
+  	FT5316_RdParFrPCTPFun(buf, 7);
 	#endif
 
   ts_event.touch_point = buf[2] & 0xf;
@@ -97,7 +108,7 @@ uchar ft5x0x_read_data(void)
 	}
 	else
 	{
-    s_event.x1 = 0xFFFF;
+    ts_event.x1 = 0xFFFF;
 	 	ts_event.y1 = 0xFFFF;
 	 	ret = 0;
 	}
@@ -107,23 +118,14 @@ uchar ft5x0x_read_data(void)
 }
 
 
-void  counter0(void)
+bool FT5316_sampleTouch(unsigned short* x, unsigned short* y)
 {
- 	if(PEN==0)										//Detect the occurrence of an interrupt
- 	{
-		ts_event.Key_Sta=Key_Down;                              
-
- 	}
-}
-
-
-struct _ts_event touchGetPoint(void)
-{
-  while(ts_event.Key_Sta!=Key_Down)
+  *x = -1*(ts_event.x1-1023);
+  *y = -1*(ts_event.y1-599);
+  if(ts_event.Key_Sta == KEY_DOWN)
   {
-    counter0();
+    ts_event.Key_Sta = KEY_UP;
+    return true;
   }
-  ts_event.Key_Sta=Key_Up;
-  ft5x0x_read_data();
-  return ts_event;
+  return false;
 }

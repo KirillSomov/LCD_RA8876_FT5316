@@ -29,5 +29,9 @@ void LCD_drawBitmapPageBuf(unsigned short* pixels,
                            unsigned long bufPage, unsigned long destPage,
                            unsigned short x, unsigned short y, unsigned short w, unsigned short h);
 
+void Touch_init(void);
+void Touch_handler(void);
+bool Touch_sampleTouch(unsigned short* x, unsigned short* y);
+
 
 #endif
