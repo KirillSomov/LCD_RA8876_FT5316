@@ -9,6 +9,7 @@
 void LCD_init(void);
 
 void LCD_setPage(unsigned long page);
+void LCD_showPage(unsigned long page);
 void LCD_cleanCurrentPage(unsigned short color);
 
 void LCD_printString(char* string, unsigned short x, unsigned short y, unsigned short backgroundColor, unsigned short textColor);

@@ -22,6 +22,15 @@ void LCD_init(void)
 
 void LCD_setPage(unsigned long page)
 {
+  Canvas_Image_Start_address(page);
+  Canvas_image_width(1024);
+  Active_Window_XY(0,0);
+  Active_Window_WH(1024,600);
+}
+
+
+void LCD_showPage(unsigned long page)
+{
   Select_Main_Window_16bpp();
   Main_Image_Start_Address(page);
   Main_Image_Width(1024);
