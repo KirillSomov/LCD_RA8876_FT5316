@@ -23,11 +23,13 @@ void LCD_drawFilledCircle(unsigned short x, unsigned short y, unsigned short r, 
 void LCD_drawEllipse(unsigned short x, unsigned short y, unsigned short rx, unsigned short ry, unsigned short color);
 void LCD_drawFilledEllipse(unsigned short x, unsigned short y, unsigned short rx, unsigned short ry, unsigned short color);
 
-void LCD_drawBitmap(unsigned short* pixels, unsigned short x, unsigned short y, unsigned short w, unsigned short h);
-void LCD_copyArea(unsigned long sourcePage, unsigned long destPage,
+void LCD_drawBitmap(unsigned char* pixels, unsigned short pictureBpp,
+                    unsigned short x, unsigned short y, unsigned short w, unsigned short h);
+void LCD_copyArea(unsigned long sourcePage, unsigned short sourcePageBpp,
+                  unsigned long destPage, unsigned short destPageBpp,
                   unsigned short x, unsigned short y, unsigned short w, unsigned short h);
-void LCD_drawBitmapPageBuf(unsigned short* pixels,
-                           unsigned long bufPage, unsigned long destPage,
+void LCD_drawBitmapPageBuf(unsigned char* pixels, unsigned short pictureBpp,
+                           unsigned long bufPage, unsigned long destPage, unsigned short destPageBpp,
                            unsigned short x, unsigned short y, unsigned short w, unsigned short h);
 
 void Touch_init(void);

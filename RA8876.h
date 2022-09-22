@@ -81,6 +81,9 @@
 #define PAGE8_START_ADDR (1024 * 600 * 2 * 8)
 #define PAGE9_START_ADDR (1024 * 600 * 2 * 9)
 
+#define MODE_8BPP 0
+#define MODE_16BPP 1
+
 
 #define color256_black   0x00
 #define color256_white   0xff
@@ -990,7 +993,8 @@ void LCD_DisplayString(uint X,uint Y, char *ptr, uint charColor, uint bkColor);
 // ======================================================================================
 
 
-void Show_picture(unsigned long numbers,const unsigned short *datap);
+void Show_picture(unsigned long numbers, const unsigned short *datap);
+void Show_picture8bpp(unsigned long numbers, const unsigned char *datap);
 void Show_picture1(unsigned long numbers,const unsigned short *datap);
 
 void LCD_Clear(uint Color);
@@ -998,8 +1002,6 @@ void LCD_SetCursor(uint Xpos, uint Ypos);
 
 void LCD_SetPoint(uint x,uint y,uint point);
 void LCD_WriteRAM_Prepare(void);
-
-void Show_picture(unsigned long numbers,const unsigned short *datap);
 
 
 #endif

@@ -133,47 +133,100 @@ void LCD_drawFilledEllipse(unsigned short x, unsigned short y, unsigned short rx
 }
 
 
-void LCD_drawBitmap(unsigned short* pixels, unsigned short x, unsigned short y, unsigned short w, unsigned short h)
+void LCD_drawBitmap(unsigned char* pixels, unsigned short pictureBpp,
+                    unsigned short x, unsigned short y, unsigned short w, unsigned short h)
 {
   Active_Window_XY(x, y);
   Active_Window_WH(w, h);
   Goto_Pixel_XY(x, y);
-  Show_picture(w*h, pixels);
+  switch(pictureBpp)
+  {
+    case MODE_8BPP:
+      Memory_8bpp_Mode();
+      Show_picture8bpp(w*h, pixels);
+      break;
+
+    case MODE_16BPP:
+      Memory_16bpp_Mode();
+      Show_picture(w*h, pixels);
+      break;
+  
+    default:
+      return;
+  }  
   Active_Window_XY(0,0);
   Active_Window_WH(1024,600);
 }
 
 
-void LCD_copyArea(unsigned long sourcePage, unsigned long destPage,
+void LCD_copyArea(unsigned long sourcePage, unsigned short sourcePageBpp,
+                  unsigned long destPage, unsigned short destPageBpp,
                   unsigned short x, unsigned short y, unsigned short w, unsigned short h)
 {
   //BTE memory(move) from source page to dest page
-  BTE_S0_Color_16bpp();
+  switch(sourcePageBpp)
+  {
+    case MODE_8BPP:
+      BTE_S0_Color_8bpp();
+      break;
+
+    case MODE_16BPP:
+      BTE_S0_Color_16bpp();
+      break;
+  
+    default:
+      return;
+  }
   BTE_S0_Memory_Start_Address(sourcePage);
   BTE_S0_Image_Width(1024);
   BTE_S0_Window_Start_XY(x, y);
 
-  BTE_Destination_Color_16bpp();
+  switch(destPageBpp)
+  {
+    case MODE_8BPP:
+      BTE_Destination_Color_8bpp();
+      break;
+
+    case MODE_16BPP:
+      BTE_Destination_Color_16bpp();
+      break;
+  
+    default:
+      return;
+  }
   BTE_Destination_Memory_Start_Address(destPage);
   BTE_Destination_Image_Width(1024);
   BTE_Destination_Window_Start_XY(x, y);
   BTE_Window_Size(w, h);
 
   //move with ROP 0 
-  BTE_ROP_Code(12);       //memory copy s0(sourcePage) to destPage
-  BTE_Operation_Code(2);  //BTE move
+  BTE_ROP_Code(12);           //memory copy s0(sourcePage) to destPage
+  BTE_Operation_Code(2);      //BTE move
   BTE_Enable();
   Check_BTE_Busy();
 }
 
 
-void LCD_drawBitmapPageBuf(unsigned short* pixels,
-                           unsigned long bufPage, unsigned long destPage,
+void LCD_drawBitmapPageBuf(unsigned char* pixels, unsigned short pictureBpp,
+                           unsigned long bufPage, unsigned long destPage, unsigned short destPageBpp,
                            unsigned short x, unsigned short y, unsigned short w, unsigned short h)
 {
   Canvas_Image_Start_address(bufPage);
-  LCD_drawBitmap(pixels, x, y, w, h);
-  LCD_copyArea(bufPage, destPage, x, y, w, h);
+  LCD_drawBitmap(pixels, pictureBpp, x, y, w, h);
+  LCD_copyArea(bufPage, pictureBpp, destPage, destPageBpp, x, y, w, h);
+  switch(destPageBpp)
+  {
+    case MODE_8BPP:
+      Memory_8bpp_Mode();
+      break;
+
+    case MODE_16BPP:
+      Memory_16bpp_Mode();
+      break;
+  
+    default:
+      return;
+  }
   LCD_setPage(destPage);
 }
 

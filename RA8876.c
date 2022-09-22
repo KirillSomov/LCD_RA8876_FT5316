@@ -6880,6 +6880,21 @@ void Show_String(char *str)
 }
 
 
+void Show_picture8bpp(unsigned long numbers, const unsigned char *datap)
+{   
+  unsigned long i = 0;
+
+  LCD_CmdWrite(0x04);
+  while(i<numbers)
+  {
+    LCD_DataWrite(datap[i++]);
+    LCD_DataWrite(datap[i++]);
+    Check_Mem_WR_FIFO_not_Full();
+  }
+
+}
+
+
 void Show_picture(unsigned long numbers,const unsigned short *datap)
 {   
   unsigned long i;
@@ -6892,7 +6907,8 @@ void Show_picture(unsigned long numbers,const unsigned short *datap)
    Check_Mem_WR_FIFO_not_Full();
    }
 
-}  
+}
+
 
 void Show_picture1(unsigned long numbers,const unsigned short *datap)
 {   
