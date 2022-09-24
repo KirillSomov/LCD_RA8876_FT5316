@@ -81,9 +81,6 @@
 #define PAGE8_START_ADDR (1024 * 600 * 2 * 8)
 #define PAGE9_START_ADDR (1024 * 600 * 2 * 9)
 
-#define MODE_8BPP 0
-#define MODE_16BPP 1
-
 
 #define color256_black   0x00
 #define color256_white   0xff

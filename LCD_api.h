@@ -6,13 +6,34 @@
 #include "FT5316.h"
 
 
+#define MODE_8BPP 0
+#define MODE_16BPP 1
+
+#define FONT_SIZE_8X16 1
+#define FONT_SIZE_12X24 2
+#define FONT_SIZE_16X32 3
+
+#define FONT_WIDTH_X1 1
+#define FONT_WIDTH_X2 2
+#define FONT_WIDTH_X3 3
+#define FONT_WIDTH_X4 4
+
+#define FONT_HEIGHT_X1 1
+#define FONT_HEIGHT_X2 2
+#define FONT_HEIGHT_X3 3
+#define FONT_HEIGHT_X4 4
+
+
 void LCD_init(void);
 
 void LCD_setPage(unsigned long page);
 void LCD_showPage(unsigned long page);
 void LCD_cleanCurrentPage(unsigned short color);
 
-void LCD_printString(char* string, unsigned short x, unsigned short y, unsigned short backgroundColor, unsigned short textColor);
+void LCD_printString(char* string,
+                     unsigned short x, unsigned short y,
+                     unsigned short size, unsigned short wScaler, unsigned short hScaler,
+                     unsigned short backgroundColor, unsigned short textColor);
 
 void LCD_drawSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);
 void LCD_drawFilledSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);

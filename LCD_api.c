@@ -51,12 +51,77 @@ void LCD_cleanCurrentPage(unsigned short color)
 }
 
 
-void LCD_printString(char* string, unsigned short x, unsigned short y, unsigned short backgroundColor, unsigned short textColor)
+void LCD_printString(char* string,
+                     unsigned short x, unsigned short y,
+                     unsigned short size, unsigned short wScaler, unsigned short hScaler,
+                     unsigned short backgroundColor, unsigned short textColor)
 {
   Foreground_color_65k(textColor);
   Background_color_65k(backgroundColor);
   CGROM_Select_Internal_CGROM();
-  Font_Select_12x24_24x24();
+  Internal_CGROM_Select_ISOIEC8859_4();
+  switch(size)
+  {
+    case FONT_SIZE_8X16:
+      Font_Select_8x16_16x16();
+      break;
+
+    case FONT_SIZE_12X24:
+      Font_Select_12x24_24x24();
+      break;
+
+    case FONT_SIZE_16X32:
+      Font_Select_16x32_32x32();
+      break;
+
+    default:
+      break;
+  }
+
+  switch(wScaler)
+  {
+    case FONT_WIDTH_X1:
+      Font_Width_X1();
+      break;
+
+    case FONT_WIDTH_X2:
+      Font_Width_X2();
+      break;
+
+    case FONT_WIDTH_X3:
+      Font_Width_X3();
+      break;
+
+    case FONT_WIDTH_X4:
+      Font_Width_X4();
+      break;
+
+    default:
+      break;
+  }
+
+  switch(hScaler)
+  {
+    case FONT_HEIGHT_X1:
+      Font_Height_X1();
+      break;
+
+    case FONT_HEIGHT_X2:
+      Font_Height_X2();
+      break;
+
+    case FONT_HEIGHT_X3:
+      Font_Height_X3();
+      break;
+
+    case FONT_HEIGHT_X4:
+      Font_Height_X4();
+      break;
+
+    default:
+      break;
+  }
+
   Goto_Text_XY(x, y);
   Show_String(string);
 }
