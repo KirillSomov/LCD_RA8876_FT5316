@@ -35,6 +35,7 @@ void LCD_printString(char* string,
                      unsigned short size, unsigned short wScaler, unsigned short hScaler,
                      signed long backgroundColor, unsigned short textColor);
 
+void LCD_drawLine(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);
 void LCD_drawSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);
 void LCD_drawFilledSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);
 void LCD_drawCircleSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short rx, unsigned short ry, unsigned short color);

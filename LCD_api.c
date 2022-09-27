@@ -140,6 +140,15 @@ void LCD_printString(char* string,
 }
 
 
+void LCD_drawLine(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color)
+{
+  Foreground_color_65k(color);
+  Line_Start_XY(x0, y0);
+  Line_End_XY(x1, y1);
+  Start_Line();
+}
+
+
 void LCD_drawSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color)
 {
   Foreground_color_65k(color);
