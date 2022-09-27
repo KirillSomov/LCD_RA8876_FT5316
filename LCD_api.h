@@ -33,7 +33,7 @@ void LCD_cleanCurrentPage(unsigned short color);
 void LCD_printString(char* string,
                      unsigned short x, unsigned short y,
                      unsigned short size, unsigned short wScaler, unsigned short hScaler,
-                     unsigned short backgroundColor, unsigned short textColor);
+                     signed long backgroundColor, unsigned short textColor);
 
 void LCD_drawSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);
 void LCD_drawFilledSquare(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1, unsigned short color);

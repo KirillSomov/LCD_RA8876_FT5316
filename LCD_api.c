@@ -54,10 +54,23 @@ void LCD_cleanCurrentPage(unsigned short color)
 void LCD_printString(char* string,
                      unsigned short x, unsigned short y,
                      unsigned short size, unsigned short wScaler, unsigned short hScaler,
-                     unsigned short backgroundColor, unsigned short textColor)
+                     signed long backgroundColor, unsigned short textColor)
 {
+  if(backgroundColor == -1)
+  {
+    Font_Background_select_Transparency();
+  }
+  else if((backgroundColor >= 0) && (backgroundColor <= 0xFFFF))
+  {
+    Font_Background_select_Color();
+    Background_color_65k(backgroundColor);
+  }
+  else
+  {
+    Font_Background_select_Color();
+    Background_color_65k(White);
+  }
   Foreground_color_65k(textColor);
-  Background_color_65k(backgroundColor);
   CGROM_Select_Internal_CGROM();
   Internal_CGROM_Select_ISOIEC8859_4();
   switch(size)
